@@ -11,8 +11,8 @@ class DualLinkDataNode
 {
 public:
 	T data;
-	T firstAndLastName;
-	T birthDate;
+	//T firstAndLastName;
+	//T birthDate;
 	DualLinkDataNode<T> *leftBranch;
 	DualLinkDataNode<T> *rightBranch;
 
@@ -43,15 +43,15 @@ protected:
 	//  this function is access protected from anything outside the class for safety
 	DualLinkDataNode<T> *addInOrder(DualLinkDataNode<T> *subTreePtr, DualLinkDataNode<T> *newNode)
 	{
-		//  if the current sub-tree is empty, return the address of the new node
-		if (!subTreePtr)
+		// if the current sub-tree is empty, return the address of the new node
+		if (subTreePtr == nullptr)
 		{
 			return newNode;
 		}
 
 		else
 		{
-			//  if the sub-tree's data is greater than or equal to new node's data, send new node down the left branch
+			// if the sub-tree's data is greater than or equal to new node's data, send new node down the left branch
 			if (newNode->data <= subTreePtr->data)
 			{
 				subTreePtr->leftBranch = addInOrder(subTreePtr->leftBranch, newNode);
@@ -70,14 +70,14 @@ protected:
 	DualLinkDataNode<T> *removeValue(DualLinkDataNode<T> *subTreePtr, const T findThis, bool &successBoolean)
 	{
 		DualLinkDataNode<T> *tempPtr = nullptr;
-		//  if the value was not found, terminate removeValue() function, and return a false for success
+		// if the value was not found, terminate the removeValue() recursion, and return a false for success
 		if (subTreePtr == nullptr)
 		{
 			successBoolean = false;
 			return nullptr;
 		}
 
-		//  if the value was found, send this node's address to removeNode() function and set success to true
+		// if the value was found, send this node's address to removeNode() function and set success to true
 		else if (subTreePtr->data == findThis)
 		{
 			// Item is in the root of some subtree
@@ -109,16 +109,16 @@ protected:
 	{
 		DualLinkDataNode<T> * tempPtr = nullptr;
 
-		//  if the sub-tree has no left or right branches, delete the node and return a nullptr
+		// if the sub-tree has no left or right branches, delete the node and return a nullptr
 		if (currentNode->leftBranch == nullptr && currentNode->rightBranch == nullptr)
 		{
 			delete currentNode;
-			//currentNode = nullptr;
+			currentNode = nullptr;
 			//return currentNode;
 			return nullptr;
 		}
 
-		//  if the sub-tree has only one branch
+		// if the sub-tree has only one branch
 		else if ((currentNode->leftBranch != nullptr && currentNode->rightBranch == nullptr) || (currentNode->rightBranch != nullptr && currentNode->leftBranch == nullptr))
 		{
 			// store currnetNode's address in tempPtr
@@ -143,19 +143,12 @@ protected:
 			}
 		}
 
-
-		//  else, the sub-tree has two branches
+		// else, the sub-tree has two branches
 		else
 		{
 			// Find the inorder successor of the entry in N: it is in the left subtree rooted at N’s right child
-			//tempPtr = removeLeftmostNode(nodePtr->getRightChildPtr(), newNodeValue)
-			//nodePtr->setRightChildPtr(tempPtr);
-			//nodePtr->setItem(newNodeValue); // Put replacement value in node N
-			//return nodePtr;
-
 			tempPtr = removeLeftMostNode(currentNode->rightBranch, currentNode->data);  // data is referenced in removeleftnode function
 			currentNode->rightBranch = tempPtr;
-			//currentNode->data = tempPtr->data; // needs testing
 			currentNode->data = currentNode->data;  // because the data was referenced, it has now been changed
 			return currentNode;
 		}
@@ -184,15 +177,37 @@ protected:
 		
 	}
 
-	/*
-	// Returns a pointer to the node containing the given value,
-	// or nullptr if not found.
-	DualLinkDataNode<T> *findNode(DualLinkDataNode<T>* treePtr, const T &findThis) const
+	//  Recursive function to search the tree for a specific value
+	DualLinkDataNode<T> *searchTree(const T findThis, DualLinkDataNode<T> *root, bool &successBoolean)
+	//bool searchTree(T value, DualLinkDataNode<T> *root)
 	{
-		//  clifford:  this also needs to be finished
-		//  if it is needed.  Not sure right now
+		// if the value was not found, return false
+		if (root == nullptr)
+		{
+			//return false;
+			successBoolean = false;
+			return nullptr;
+		}
+		// if the value is found, return true and unwind the recursion
+		else if (root->data == findThis)
+		{
+			//return true;
+			successBoolean = true;
+			return root;
+		}
+		// if the search value is less than or equal to the data stored in the node, use recursion to travel down the left branch
+		else if (findThis <= root->data)
+		{
+			//return searchTree(value, root->leftBranch);
+			return searchTree(findThis, root->leftBranch, successBoolean);
+		}
+		// else travel down the right branch
+		else
+		{
+			//return searchTree(findThis, root->rightBranch);
+			return searchTree(findThis, root->rightBranch, successBoolean);
+		}
 	}
-	*/
 
 public:
 	//------------------------------------------------------------
@@ -237,7 +252,7 @@ public:
 	//  returns true if the node was removed, or returns false
 	bool deleteValue(T value)
 	{
-		bool status;  // store the result of the remove node function
+		bool status;  // store the result of the remove node recursion
 
 		//  if the tree has no items, print out the error message
 		if (!rootNode)
@@ -254,29 +269,77 @@ public:
 		return status;
 	}
 
-	void searchNode(T value)
+	bool searchForValue(T value)
 	{
-		// search for a value
+		bool status;
+		if (!rootNode)
+		{
+			return false;
+		}
+		else if (rootNode->data == value)
+		{
+			return true;
+		}
+		// if the search value is less than or equal to the data in rootNode, travel down the left branch
+		else if (value <= rootNode->data)
+		{
+			//return searchTree(value, rootNode->leftBranch);
+			searchTree(value, rootNode->leftBranch, status);
+
+		}
+		// else, travel down the right branch
+		else
+		{
+			//return searchTree(value, rootNode->rightBranch);
+			searchTree(value, rootNode->rightBranch, status);
+		}
+		return status;
 	}
 
-	void modifyNodeValue(T value)
+
+	void searchAndModify(T findThis)
 	{
+		T newValue;
+		bool status;
+		DualLinkDataNode<T> *nodeWithSeachValue = nullptr;
 		// search for a value, and if found, modify the node's data member
-	}
-
-
-	DualLinkDataNode<T> *getNewNode(T data)
-	{
-		DualLinkDataNode<T> *newNode = new DualLinkDataNode<T>();
-		newNode->data = data;
-		newNode->leftBranch = nullptr;
-		newNode->rightBranch = nullptr;
-		return newNode;
+		if (!rootNode)
+		{
+			std::cout << "error: tree is empty";
+		}
+		else if (rootNode->data == findThis)
+		{
+			std::cout << "current value: " << rootNode->data << std::endl;
+			std::cout << "enter a new value: ";
+			getline(std::cin, newValue);
+			rootNode->data = newValue;
+		}
+		else if (findThis <= rootNode->data)
+		{
+			// search for the value, and if the value is found, prompt for a new value
+			nodeWithSeachValue = searchTree(findThis, rootNode->leftBranch, status);
+		}
+		else
+		{
+			nodeWithSeachValue = searchTree(findThis, rootNode->rightBranch, status);
+		}
+		if (nodeWithSeachValue != nullptr && status == true)
+		{
+			std::cout << "current value: " << nodeWithSeachValue->data << std::endl;
+			std::cout << "enter a new value: ";
+			getline(std::cin, newValue);
+			nodeWithSeachValue->data = newValue;
+		}
+		else
+		{
+			std::cout << "value: " << findThis << " was not found";
+		}
 	}
 
 	void insert(T data)
 	{
-		DualLinkDataNode<T> *newBstNode = new DualLinkDataNode<T>(data);
+		DualLinkDataNode<T> *newBstNode = nullptr;
+		newBstNode = new DualLinkDataNode<T>(data);
 
 		// if the tree is empty, set the root as the new node 
 		//if (root == nullptr)
@@ -324,63 +387,6 @@ public:
 	}
 
 
-	//BstNode<T> *insert(T data, BstNode<T> *root)
-	//{
-	//	if (root == nullptr)
-	//	{
-	//		root = getNewNode(data);
-	//	}
-	//	//if data values are the same, the root will be saved to the left
-	//	else if (data <= root->data)
-	//	{
-	//		root->leftBranch = insert(data, root->leftBranch);
-	//	}
-	//	else
-	//	{
-	//		root->rightBranch = insert(data, root->rightBranch);
-	//	}
-	//	return root;
-	//}
-
-	bool search(int data)
-	{
-		if (rootNode == nullptr)
-		{
-			return false;
-		}
-		else if (rootNode->data == data)
-		{
-			return true;
-		}
-		else if (data <= rootNode->data)
-		{
-			return search(data, rootNode->leftBranch);
-		}
-		else
-		{
-			return search(data, rootNode->rightBranch);
-		}
-	}
-
-	bool search(int data, DualLinkDataNode<T> *root)
-	{
-		if (root == nullptr)
-		{
-			return false;
-		}
-		else if (root->data == data)
-		{
-			return true;
-		}
-		else if (data <= root->data)
-		{
-			return search(data, root->leftBranch);
-		}
-		else
-		{
-			return search(data, root->rightBranch);
-		}
-	}
 
 	//  breadth - first traversal mechanism
 	//  this is the renmaed void levelOrder() function
@@ -412,6 +418,61 @@ public:
 		// post-order traversal mechanism
 	}
 
+
+
+
+	//BstNode<T> *insert(T data, BstNode<T> *root)
+	//{
+	//	if (root == nullptr)
+	//	{
+	//		root = getNewNode(data);
+	//	}
+	//	//if data values are the same, the root will be saved to the left
+	//	else if (data <= root->data)
+	//	{
+	//		root->leftBranch = insert(data, root->leftBranch);
+	//	}
+	//	else
+	//	{
+	//		root->rightBranch = insert(data, root->rightBranch);
+	//	}
+	//	return root;
+	//}
+
+	//DualLinkDataNode<T> *getNewNode(T data)
+	//{
+	//	DualLinkDataNode<T> *newNode = new DualLinkDataNode<T>();
+	//	newNode->data = data;
+	//	newNode->leftBranch = nullptr;
+	//	newNode->rightBranch = nullptr;
+	//	return newNode;
+	//}
+
+
+	//bool search(int data)
+	//{
+	//	if (rootNode == nullptr)
+	//	{
+	//		return false;
+	//	}
+	//	else if (rootNode->data == data)
+	//	{
+	//		return true;
+	//	}
+	//	else if (data <= rootNode->data)
+	//	{
+	//		return search(data, rootNode->leftBranch);
+	//	}
+	//	else
+	//	{
+	//		return search(data, rootNode->rightBranch);
+	//	}
+	//}
+
 };
+
+
+
+
 
 #endif
