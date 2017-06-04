@@ -107,19 +107,21 @@ protected:
 	// Returns a pointer to the node at this tree location after node N is deleted.
 	DualLinkDataNode<T> *removeNode(DualLinkDataNode<T> *currentNode)
 	{
+		DualLinkDataNode<T> * tempPtr = nullptr;
+
 		//  if the sub-tree has no left or right branches, delete the node and return a nullptr
 		if (currentNode->leftBranch == nullptr && currentNode->rightBranch == nullptr)
 		{
-			// Remove leaf from the tree
 			delete currentNode;
-			currentNode = nullptr;
-			return currentNode;
+			//currentNode = nullptr;
+			//return currentNode;
+			return nullptr;
 		}
 
 		//  if the sub-tree has only one branch
 		else if ((currentNode->leftBranch != nullptr && currentNode->rightBranch == nullptr) || (currentNode->rightBranch != nullptr && currentNode->leftBranch == nullptr))
 		{
-			DualLinkDataNode<T> * tempPtr = nullptr;
+			// store currnetNode's address in tempPtr
 			tempPtr = currentNode;
 
 			//  if the sub-tree's path is only on the left branch, make subTreePtr point to the left branch
@@ -142,53 +144,55 @@ protected:
 		}
 
 
-		//  clifford: this is as far as I got
-		//  this portion needs to be finished
-
 		//  else, the sub-tree has two branches
 		else
 		{
-			// Find the inorder successor of the entry in N: it is in the left subtree rooted
-			// at N’s right child
+			// Find the inorder successor of the entry in N: it is in the left subtree rooted at N’s right child
+			//tempPtr = removeLeftmostNode(nodePtr->getRightChildPtr(), newNodeValue)
+			//nodePtr->setRightChildPtr(tempPtr);
+			//nodePtr->setItem(newNodeValue); // Put replacement value in node N
+			//return nodePtr;
 
-			/*
-			tempPtr = removeLeftmostNode(nodePtr->getRightChildPtr(), newNodeValue)
-				nodePtr->setRightChildPtr(tempPtr)
-				nodePtr->setItem(newNodeValue) // Put replacement value in node N
-				return nodePtr
-				*/
+			tempPtr = removeLeftMostNode(currentNode->rightBranch, currentNode->data);  // data is referenced in removeleftnode function
+			currentNode->rightBranch = tempPtr;
+			//currentNode->data = tempPtr->data; // needs testing
+			currentNode->data = currentNode->data;  // because the data was referenced, it has now been changed
+			return currentNode;
 		}
 	}
 
 
 
-	//  clifford:  this also needs to be finished
-	//  and the removal functions need to be tested
 
-	// Removes the leftmost node in the left subtree of the node pointed to by  nodePtr .
+	// Removes the leftmost node in the left subtree of the node pointed to by nodePtr.
 	// Sets inorderSuccessor to the value in this node.
 	// Returns a pointer to the revised subtree.
-	DualLinkDataNode<T> removeLeftmostNode(DualLinkDataNode<T> *nodePtr, T &inorderSuccesssor)
+	DualLinkDataNode<T> *removeLeftMostNode(DualLinkDataNode<T> *nodePtr, T &inorderSuccesssor)
 	{
-		/*
-		if (nodePtr->getLeftChildPtr() == nullptr)
+		// 
+		if (nodePtr->leftBranch == nullptr)
 		{
 			// This is the node you want; it has no left child, but it might have a right subtree
-			inorderSuccesssor = nodePtr->getItem()
-				return removeNode(nodePtr)
+			inorderSuccesssor = nodePtr->data;
+			return removeNode(nodePtr);
 		}
+		// 
 		else
-			return removeLeftmostNode(nodePtr->getLeftChildPtr(), inorderSuccesssor)
-		*/
+		{
+			return removeLeftMostNode(nodePtr->leftBranch, inorderSuccesssor);
+		}
+		
 	}
 
+	/*
 	// Returns a pointer to the node containing the given value,
 	// or nullptr if not found.
-	DualLinkDataNode<T>* findNode(DualLinkDataNode<T>* treePtr, const T &target) const
+	DualLinkDataNode<T> *findNode(DualLinkDataNode<T>* treePtr, const T &findThis) const
 	{
 		//  clifford:  this also needs to be finished
 		//  if it is needed.  Not sure right now
 	}
+	*/
 
 public:
 	//------------------------------------------------------------
@@ -211,7 +215,7 @@ public:
 	//------------------------------------------------------------
 
 	// another way to add nodes to the binary tree, based on the book's design
-	void addNode(T value)
+	void addValue(T value)
 	{
 		DualLinkDataNode<T> *newNode = new DualLinkDataNode<T>(value);
 
@@ -230,19 +234,21 @@ public:
 
 	//  the public remove node function
 	//  removes the node holding the passed value, if the node is in the tree
-	bool removeNode(T value)
+	//  returns true if the node was removed, or returns false
+	bool deleteValue(T value)
 	{
 		bool status;  // store the result of the remove node function
 
-					  //  if the tree has no items, print out the error message
+		//  if the tree has no items, print out the error message
 		if (!rootNode)
 		{
 			std::cout << "error: the tree has no items";
 			return false;
 		}
+
+		// else, call the protected removeValue() function
 		else
 		{
-			// call the protected removeValue() function
 			removeValue(rootNode, value, status);
 		}
 		return status;

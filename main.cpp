@@ -23,44 +23,53 @@ int main()
 	root.breadth_firstTraversal();
 	cout << endl;
 
+	root.deleteValue(12);
+	root.breadth_firstTraversal();
+	cout << endl;
+
+	root.addValue(105);
+	root.breadth_firstTraversal();
+	cout << endl;
+
 	// testing stuff
 	BinarySearchTree<int> testRoot2;
-	testRoot2.addNode(121);
-	testRoot2.addNode(12);
-	testRoot2.addNode(23);
-	testRoot2.addNode(154);
-	testRoot2.addNode(25);
-	testRoot2.addNode(46);
-	testRoot2.addNode(107);
+	testRoot2.addValue(121);
+	testRoot2.addValue(12);
+	testRoot2.addValue(23);
+	testRoot2.addValue(154);
+	testRoot2.addValue(25);
+	testRoot2.addValue(46);
+	testRoot2.addValue(107);
 
 	testRoot2.breadth_firstTraversal();
 	cout << endl;
 
 
 	BinarySearchTree<string> testRootString;
-	testRootString.addNode("one");
-	testRootString.addNode("three");
-	testRootString.addNode("five");
-	testRootString.addNode("seven");
-	testRootString.addNode("eleven");
-	testRootString.addNode("thirteen");
-	testRootString.addNode("seventeen");
+	testRootString.addValue("one");
+	testRootString.addValue("three");
+	testRootString.addValue("five");
+	testRootString.addValue("seven");
+	testRootString.addValue("eleven");
+	testRootString.addValue("thirteen");
+	testRootString.addValue("seventeen");
+	testRootString.deleteValue("seventeen");
 
 	testRootString.breadth_firstTraversal();
 	cout << endl;
 
 	cout << endl;
 
-	int number = 0;
-	while (number != -1)
+	int number = -1;
+	while (number != 0)
 	{
-		cout << "Enter a positive number to be searched, enter -1 to exit: \n";
+		cout << "Enter a positive number to be searched, enter <0> to exit: ";
 		cin >> number;
 		if (root.search(number) == true)
 		{
 			cout << "Found\n\n";
 		}
-		else if (number == -1)
+		else if (number == 0)
 		{
 			break;
 		}
