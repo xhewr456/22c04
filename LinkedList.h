@@ -78,7 +78,7 @@ public:
 		DataNode<T> *currentNode; // To traverse the list
 		DataNode<T> *nextNode; // To point to the next node
 
-							   // Position nodePtr at the head of the list.
+		// Position nodePtr at the head of the list.
 		currentNode = first;
 
 		// While nodePtr is not at the end of the list...
@@ -386,7 +386,7 @@ public:
 			int listLocation = 0;
 			DataNode<T> *currentNode = first; // To traverse the list
 
-											  // Skip all nodes whose value member is not equal to searchValue.
+			// Skip all nodes whose value member is not equal to searchValue.
 			while (currentNode != nullptr && currentNode->data != searchValue)
 			{
 				currentNode = currentNode->nextNode;
@@ -414,7 +414,7 @@ public:
 		DataNode<T> *currentNode = first; // To traverse the list
 		DataNode<T> *previousNode = nullptr; // To point to the previous node
 
-											 // If the list is empty, do nothing.
+		// If the list is empty, do nothing.
 		if (!first)
 			return;
 

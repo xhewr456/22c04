@@ -1,147 +1,141 @@
+// 22C - Manish Goel
+// Lab 04: Binary Search Tree
+// Names: Alexander McNulty, Clifford Smith
+
+/*
+This program is a demonstration of binary search tree.
+When run the program dataFile.txt in the CWD (current working directory)
+reads in the data then sorts and print them to two seperate files.
+Check the CWD for two files:
+sortedBirthdates.txt - contains dates in breadth-first traversal
+sortedNames.txt		 - contains dates in post-order traversal
+This task is accomplished by the exposed behaviors in BinarySearchTree.h.
+BinarySearchTree.h requires LinkedList.h and QueueADT.h to be in CWD
+In this program we used:
+addValue(string)
+printPostOrderTraverse(ofstream)
+printBreadthFirstTraverse(ofstream)
+See top of BinarySearchTree.h for additional methods
+*/
+
 #include<iostream>
 #include<string>
-//#include"LinkedList.h"
-#include"QueueADT.h"
-#include"BinarySearchTree.h"
 #include<fstream>
+#include"BinarySearchTree.h"
 
 using namespace std;
 
-
 int main()
 {
-	// open the data input file
+	// create and open the INPUT FILE - containing names, and birthdays
 	ifstream inputFile;
-	inputFile.open("dataFile.txt");
-	ofstream namesOutputFile;
-	namesOutputFile.open("sortedNames.txt");
-	ofstream birthdateOutputFile;
-	birthdateOutputFile.open("sortedBirthdates.txt");
+	string fileName;
+	cout << "enter the file path and name of the input file, the default is \"dataFile.txt\"" << endl;
+	cout << "file path/name: ";
+	getline(cin, fileName);
+	inputFile.open(fileName);
 
-
+	//create TWO SEPERATE TREES for holding birthdays or names
 	BinarySearchTree<string> firstAndLastNames;
 	BinarySearchTree<string> birthDates;
-	string tempStorage;
 
+	//READ, SORT, then ADD data to correct tree
+	string tempStorage;
+	cout << "creating the two binary trees...\n";
 	while (!inputFile.eof())
 	{
+
+		//READ the next line from the input file
 		getline(inputFile, tempStorage);
-		firstAndLastNames.addValue(tempStorage);
-
-		getline(inputFile, tempStorage);
-		birthDates.addValue(tempStorage);
-	}
-	inputFile.close();
-
-	// this will create the sorted names file
-	firstAndLastNames.printPostOrderTraverse(namesOutputFile);
-	cout << endl;
-	cout << endl;
-
-	// this will create the sorted birthday file
-	birthDates.printBreadthFirstTraverse(birthdateOutputFile);
-	cout << endl;
-	cout << endl;
-
-	namesOutputFile.close();
-	birthdateOutputFile.close();
-
-	BinarySearchTree<int> root; //pointer stores the address of root node
-	root.addValue(12);
-	root.addValue(1);
-	root.addValue(2);
-	root.addValue(15);
-	root.addValue(13);
-	root.addValue(2);
-	root.addValue(4);
-	root.addValue(100);
-
-	root.breadth_firstTraversal();
-	cout << endl;
-
-	//root.printPostOrderTraverse();
-	cout << endl;
-
-	root.searchAndModify(15);
-	root.breadth_firstTraversal();
-	cout << endl;
-	cout << endl;
-
-	root.deleteValue(1);
-	root.breadth_firstTraversal();
-	cout << endl;
-
-	root.addValue(105);
-	root.breadth_firstTraversal();
-	cout << endl;
-
-	root.deleteValue(105);
-	root.breadth_firstTraversal();
-	cout << endl;
-
-	root.addValue(107);
-	root.breadth_firstTraversal();
-	cout << endl;
-
-	cout << root.deleteValue(10);
-	cout << endl;
-
-	// testing stuff
-	BinarySearchTree<int> testRoot2;
-	testRoot2.addValue(121);
-	testRoot2.addValue(12);
-	testRoot2.addValue(23);
-	testRoot2.addValue(154);
-	testRoot2.addValue(25);
-	testRoot2.addValue(46);
-	testRoot2.addValue(107);
-
-	testRoot2.breadth_firstTraversal();
-	cout << endl;
-
-
-	BinarySearchTree<string> testRootString;
-	testRootString.addValue("one");
-	testRootString.addValue("three");
-	testRootString.addValue("five");
-	testRootString.addValue("seven");
-	testRootString.addValue("eleven");
-	testRootString.addValue("thirteen");
-	testRootString.addValue("seventeen");
-	testRootString.deleteValue("seventeen");
-
-	testRootString.breadth_firstTraversal();
-	cout << endl;
-
-	root.searchAndModify(15);
-	cout << endl;
-	root.breadth_firstTraversal();
-	cout << endl;
-
-	cout << endl;
-
-	int number = -1;
-	while (number != 0)
-	{
-		cout << "Enter a positive number to be searched, enter <0> to exit: ";
-		cin >> number;
-		if (root.searchForValue(number) == true)
+		//SORT ascii values for 0-9 to find DATES
+		if (tempStorage[0] == 48 ||
+			tempStorage[0] == 49 ||
+			tempStorage[0] == 50 ||
+			tempStorage[0] == 51 ||
+			tempStorage[0] == 52 ||
+			tempStorage[0] == 53 ||
+			tempStorage[0] == 54 ||
+			tempStorage[0] == 55 ||
+			tempStorage[0] == 56 ||
+			tempStorage[0] == 57)
 		{
-			cout << "Found\n\n";
-		}
-		else if (number == 0)
-		{
-			break;
+			//if the line begins with a number ADD to BIRTHDAY TREE
+			birthDates.addValue(tempStorage);
 		}
 		else
 		{
-			cout << "Not Found\n\n";
+			//if not ADD to NAMES TREE
+			firstAndLastNames.addValue(tempStorage);
 		}
 	}
+	inputFile.close();
+	cout << "completed\n";
+	cout << endl;
+
+	
+	// ask the user for a name to search for
+	cout << "enter a name to search for: ";
+	getline(cin, tempStorage);
+	bool status = firstAndLastNames.searchForValue(tempStorage);
+	if (status == true)
+	{
+		cout << tempStorage << " was found\n";
+	}
+	else
+	{
+		cout << tempStorage << " was not found\n";
+	}
+	cout << endl;
+
+	// ask the user for a name to add
+	cout << "enter a name to add: ";
+	getline(cin, tempStorage);
+	firstAndLastNames.addValue(tempStorage);
+	cout << tempStorage << " was added\n";
+	cout << endl;
+
+	// ask the user for a name to remove
+	cout << "enter a name to remove: ";
+	getline(cin, tempStorage);
+	status = firstAndLastNames.deleteValue(tempStorage);
+	if (status == true)
+	{
+		cout << tempStorage << " was removed\n";
+	}
+	else
+	{
+		cout << tempStorage << " was not removed\n";
+	}
+	cout << endl;
+
+	// ask the user for a name to modify, which is a search, delete, and add function
+	cout << "enter a name to modify: ";
+	getline(cin, tempStorage);
+	firstAndLastNames.searchAndModify(tempStorage);
+	cout << endl;
 
 
-	cin.ignore();
-	cout << "press <Enter> to exit...";
+	// create and open output file for names
+	// print the BST of names in POSTORDER to output file
+	cout << "creating the sortedNames.txt using post order traversal...\n";
+	ofstream namesOutputFile;
+	namesOutputFile.open("./sortedNames.txt");
+	firstAndLastNames.printPostOrderTraverse(namesOutputFile);
+	namesOutputFile.close();
+	cout << "completed\n";
+
+	// create and open output file for names
+	// print the BST of names in BREADTH to output file
+	cout << "creating the sortedBirthdates.txt file using breadth first traversal...\n";
+	ofstream birthdateOutputFile;
+	birthdateOutputFile.open("./sortedBirthdates.txt");
+	birthDates.printBreadthFirstTraverse(birthdateOutputFile);
+	birthdateOutputFile.close();
+	cout << "completed\n";
+	cout << endl;
+
+	//cin.ignore();
+	cout << "\npress <Enter> to exit...";
 	cin.get();
 	return 0;
 }
