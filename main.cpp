@@ -3,22 +3,68 @@
 //#include"LinkedList.h"
 #include"QueueADT.h"
 #include"BinarySearchTree.h"
+#include<fstream>
 
 using namespace std;
 
 
 int main()
 {
+	// open the data input file
+	ifstream inputFile;
+	inputFile.open("dataFile.txt");
+	ofstream namesOutputFile;
+	namesOutputFile.open("sortedNames.txt");
+	ofstream birthdateOutputFile;
+	birthdateOutputFile.open("sortedBirthdates.txt");
+
+
+	BinarySearchTree<string> firstAndLastNames;
+	BinarySearchTree<string> birthDates;
+	string tempStorage;
+
+	while (!inputFile.eof())
+	{
+		getline(inputFile, tempStorage);
+		firstAndLastNames.addValue(tempStorage);
+
+		getline(inputFile, tempStorage);
+		birthDates.addValue(tempStorage);
+	}
+	inputFile.close();
+
+	// this will create the sorted names file
+	firstAndLastNames.printPostOrderTraverse(namesOutputFile);
+	cout << endl;
+	cout << endl;
+
+	// this will create the sorted birthday file
+	birthDates.printBreadthFirstTraverse(birthdateOutputFile);
+	cout << endl;
+	cout << endl;
+
+	namesOutputFile.close();
+	birthdateOutputFile.close();
+
 	BinarySearchTree<int> root; //pointer stores the address of root node
 	root.addValue(12);
 	root.addValue(1);
 	root.addValue(2);
 	root.addValue(15);
+	root.addValue(13);
 	root.addValue(2);
 	root.addValue(4);
 	root.addValue(100);
 
 	root.breadth_firstTraversal();
+	cout << endl;
+
+	//root.printPostOrderTraverse();
+	cout << endl;
+
+	root.searchAndModify(15);
+	root.breadth_firstTraversal();
+	cout << endl;
 	cout << endl;
 
 	root.deleteValue(1);
@@ -67,9 +113,9 @@ int main()
 	testRootString.breadth_firstTraversal();
 	cout << endl;
 
-	testRootString.searchAndModify("23");
+	root.searchAndModify(15);
 	cout << endl;
-	testRootString.breadth_firstTraversal();
+	root.breadth_firstTraversal();
 	cout << endl;
 
 	cout << endl;
@@ -92,6 +138,7 @@ int main()
 			cout << "Not Found\n\n";
 		}
 	}
+
 
 	cin.ignore();
 	cout << "press <Enter> to exit...";

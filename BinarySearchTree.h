@@ -6,13 +6,16 @@ THIS PROGRAM IS A SIMPLE BINARY SEARCH TREE
 #ifndef BINARYSEARCHTREE_H
 #define BINARYSEARCHTREE_H
 
+#include<fstream>
+#include<iostream>
+//#include<string>
+//using namespace std;
+
 template <class T>
 class DualLinkDataNode
 {
 public:
 	T data;
-	//T firstAndLastName;
-	//T birthDate;
 	DualLinkDataNode<T> *leftBranch;
 	DualLinkDataNode<T> *rightBranch;
 
@@ -114,7 +117,6 @@ protected:
 		{
 			delete currentNode;
 			currentNode = nullptr;
-			//return currentNode;
 			return nullptr;
 		}
 
@@ -129,7 +131,7 @@ protected:
 			{
 				currentNode = currentNode->leftBranch;
 				delete tempPtr;
-				//currentNode = nullptr;
+				tempPtr = nullptr;
 				return currentNode;
 			}
 
@@ -138,7 +140,7 @@ protected:
 			{
 				currentNode = currentNode->rightBranch;
 				delete tempPtr;
-				//currentNode = nullptr;
+				tempPtr = nullptr;
 				return currentNode;
 			}
 		}
@@ -149,27 +151,24 @@ protected:
 			// Find the inorder successor of the entry in N: it is in the left subtree rooted at N’s right child
 			tempPtr = removeLeftMostNode(currentNode->rightBranch, currentNode->data);  // data is referenced in removeleftnode function
 			currentNode->rightBranch = tempPtr;
-			currentNode->data = currentNode->data;  // because the data was referenced, it has now been changed
+			currentNode->data = currentNode->data;  // because the data was referenced, it was changed
 			return currentNode;
 		}
 	}
-
-
-
 
 	// Removes the leftmost node in the left subtree of the node pointed to by nodePtr.
 	// Sets inorderSuccessor to the value in this node.
 	// Returns a pointer to the revised subtree.
 	DualLinkDataNode<T> *removeLeftMostNode(DualLinkDataNode<T> *nodePtr, T &inorderSuccesssor)
 	{
-		// 
+
 		if (nodePtr->leftBranch == nullptr)
 		{
 			// This is the node you want; it has no left child, but it might have a right subtree
 			inorderSuccesssor = nodePtr->data;
 			return removeNode(nodePtr);
 		}
-		// 
+
 		else
 		{
 			return removeLeftMostNode(nodePtr->leftBranch, inorderSuccesssor);
@@ -179,19 +178,16 @@ protected:
 
 	//  Recursive function to search the tree for a specific value
 	DualLinkDataNode<T> *searchTree(const T findThis, DualLinkDataNode<T> *root, bool &successBoolean)
-	//bool searchTree(T value, DualLinkDataNode<T> *root)
 	{
 		// if the value was not found, return false
 		if (root == nullptr)
 		{
-			//return false;
 			successBoolean = false;
 			return nullptr;
 		}
 		// if the value is found, return true and unwind the recursion
 		else if (root->data == findThis)
 		{
-			//return true;
 			successBoolean = true;
 			return root;
 		}
@@ -206,6 +202,25 @@ protected:
 		{
 			//return searchTree(findThis, root->rightBranch);
 			return searchTree(findThis, root->rightBranch, successBoolean);
+		}
+	}
+
+	//  Use a recursion to travel down the left branches until a dead end is found
+	//  Then travel down the right branch until a dead is found
+	//  Once both paths are checked, print out the data in the node at the end of the branch
+	//  Also this function is protected from access outside of the class
+	void post_orderTraversal(DualLinkDataNode<T> *currentRoot, std::ofstream &writeFile)
+	{
+		// if the currentRoot is null, that means this branch's patch is at the end
+		if (currentRoot == nullptr)
+		{
+			return;
+		}
+		else
+		{
+			post_orderTraversal(currentRoot->leftBranch, writeFile); // check the left branch for a valid path
+			post_orderTraversal(currentRoot->rightBranch, writeFile); // check the right branch for a valid path
+			writeFile << currentRoot->data << std::endl; // when both branches are nullptr's, print out the current node's data
 		}
 	}
 
@@ -272,6 +287,7 @@ public:
 	bool searchForValue(T value)
 	{
 		bool status;
+
 		if (!rootNode)
 		{
 			return false;
@@ -296,39 +312,32 @@ public:
 		return status;
 	}
 
-
 	void searchAndModify(T findThis)
 	{
+		// this is a two step process, first step is search for the value
+		// if the value is found, delete the node
+		// next step is insert a new node with a new value into the tree
+		// thus perserving the tree balance
 		T newValue;
 		bool status;
 		DualLinkDataNode<T> *nodeWithSeachValue = nullptr;
+
 		// search for a value, and if found, modify the node's data member
 		if (!rootNode)
 		{
 			std::cout << "error: tree is empty";
-		}
-		else if (rootNode->data == findThis)
-		{
-			std::cout << "current value: " << rootNode->data << std::endl;
-			std::cout << "enter a new value: ";
-			getline(std::cin, newValue);
-			rootNode->data = newValue;
-		}
-		else if (findThis <= rootNode->data)
-		{
-			// search for the value, and if the value is found, prompt for a new value
-			nodeWithSeachValue = searchTree(findThis, rootNode->leftBranch, status);
+			return;
 		}
 		else
 		{
-			nodeWithSeachValue = searchTree(findThis, rootNode->rightBranch, status);
+			status = deleteValue(findThis);
 		}
-		if (nodeWithSeachValue != nullptr && status == true)
+		if (status == true)
 		{
-			std::cout << "current value: " << nodeWithSeachValue->data << std::endl;
+			std::cout << "current value: " << findThis << std::endl;
 			std::cout << "enter a new value: ";
-			getline(std::cin, newValue);
-			nodeWithSeachValue->data = newValue;
+			std::cin >> newValue;
+			addValue(newValue);
 		}
 		else
 		{
@@ -336,60 +345,8 @@ public:
 		}
 	}
 
-	void insert(T data)
-	{
-		DualLinkDataNode<T> *newBstNode = nullptr;
-		newBstNode = new DualLinkDataNode<T>(data);
-
-		// if the tree is empty, set the root as the new node 
-		//if (root == nullptr)
-		if (!rootNode)
-		{
-			//root = getNewNode(data);
-			rootNode = newBstNode;
-			newBstNode->leftBranch = nullptr;
-			newBstNode->rightBranch = nullptr;
-		}
-
-		// else, if data value is less than or equal, the root will be saved to the left branch
-		else if (data <= rootNode->data)
-		{
-			//root->leftBranch = insert(data, root->leftBranch);
-			rootNode->leftBranch = insertNode(newBstNode, rootNode->leftBranch);
-		}
-
-		else
-		{
-			rootNode->rightBranch = insertNode(newBstNode, rootNode->rightBranch);
-		}
-	}
-
-	DualLinkDataNode<T> *insertNode(DualLinkDataNode<T> *newBinaryNode, DualLinkDataNode<T> *passedRoot)
-	{
-		// if the current branch leads to empty leaf, make the node that was passed (newBstNode) the new leaf
-		if (passedRoot == nullptr)
-		{
-			passedRoot = newBinaryNode;
-		}
-
-		// else, if data value is less than or equal, the root will be saved to the left branch
-		else if (newBinaryNode->data <= passedRoot->data)
-		{
-			passedRoot->leftBranch = insertNode(newBinaryNode, passedRoot->leftBranch);
-		}
-
-		// else, the new data is greater than the current root's data, try to insert the node in the right branch
-		else
-		{
-			passedRoot->rightBranch = insertNode(newBinaryNode, passedRoot->rightBranch);
-		}
-		return passedRoot;
-	}
-
-
-
 	//  breadth - first traversal mechanism
-	//  this is the renmaed void levelOrder() function
+	//  clifford: this is the renmaed void levelOrder() function
 	void breadth_firstTraversal()
 	{
 		if (rootNode == nullptr)
@@ -406,19 +363,61 @@ public:
 			{
 				DualLinkDataNode<T>* current = Q.getFront();
 				std::cout << current->data << " ";
-				if (current->leftBranch != nullptr) Q.enQueue(current->leftBranch);
-				if (current->rightBranch != nullptr) Q.enQueue(current->rightBranch);
+				if (current->leftBranch != nullptr)
+				{
+					Q.enQueue(current->leftBranch);
+				}
+				if (current->rightBranch != nullptr)
+				{
+					Q.enQueue(current->rightBranch);
+				}
 				Q.deQueue(); // remove the element at the front
 			}
 		}
 	}
 
-	void post_orderTraversal()
+	void printBreadthFirstTraverse(std::ofstream &writeFile)
 	{
-		// post-order traversal mechanism
+		if (rootNode == nullptr)
+		{
+			return;
+		}
+
+		else
+		{
+			QueueADT<DualLinkDataNode<T>*> Q;
+			Q.enQueue(rootNode);
+			//while there is at least one discovered node
+			while (!Q.isQueueEmpty())
+			{
+				DualLinkDataNode<T>* current = Q.getFront();
+				writeFile << current->data << std::endl;
+				if (current->leftBranch != nullptr)
+				{
+					Q.enQueue(current->leftBranch);
+				}
+				if (current->rightBranch != nullptr)
+				{
+					Q.enQueue(current->rightBranch);
+				}
+				Q.deQueue(); // remove the element at the front
+			}
+		}
 	}
 
 
+
+	void printPostOrderTraverse(std::ofstream &writeFile)
+	{
+		if (!rootNode)
+		{
+			std::cout << "error: tree is empty";
+		}
+		else
+		{
+			post_orderTraversal(rootNode, writeFile);
+		}
+	}
 
 
 	//BstNode<T> *insert(T data, BstNode<T> *root)
@@ -448,7 +447,6 @@ public:
 	//	return newNode;
 	//}
 
-
 	//bool search(int data)
 	//{
 	//	if (rootNode == nullptr)
@@ -469,10 +467,57 @@ public:
 	//	}
 	//}
 
+	//void insert(T data)
+	//{
+	//	DualLinkDataNode<T> *newBstNode = nullptr;
+	//	newBstNode = new DualLinkDataNode<T>(data);
+
+	//	// if the tree is empty, set the root as the new node 
+	//	//if (root == nullptr)
+	//	if (!rootNode)
+	//	{
+	//		//root = getNewNode(data);
+	//		rootNode = newBstNode;
+	//		newBstNode->leftBranch = nullptr;
+	//		newBstNode->rightBranch = nullptr;
+	//	}
+
+	//	// else, if data value is less than or equal, the root will be saved to the left branch
+	//	else if (data <= rootNode->data)
+	//	{
+	//		//root->leftBranch = insert(data, root->leftBranch);
+	//		rootNode->leftBranch = insertNode(newBstNode, rootNode->leftBranch);
+	//	}
+
+	//	else
+	//	{
+	//		rootNode->rightBranch = insertNode(newBstNode, rootNode->rightBranch);
+	//	}
+	//}
+
+	//DualLinkDataNode<T> *insertNode(DualLinkDataNode<T> *newBinaryNode, DualLinkDataNode<T> *passedRoot)
+	//{
+	//	// if the current branch leads to empty leaf, make the node that was passed (newBstNode) the new leaf
+	//	if (passedRoot == nullptr)
+	//	{
+	//		passedRoot = newBinaryNode;
+	//	}
+
+	//	// else, if data value is less than or equal, the root will be saved to the left branch
+	//	else if (newBinaryNode->data <= passedRoot->data)
+	//	{
+	//		passedRoot->leftBranch = insertNode(newBinaryNode, passedRoot->leftBranch);
+	//	}
+
+	//	// else, the new data is greater than the current root's data, try to insert the node in the right branch
+	//	else
+	//	{
+	//		passedRoot->rightBranch = insertNode(newBinaryNode, passedRoot->rightBranch);
+	//	}
+	//	return passedRoot;
+	//}
+
+
 };
-
-
-
-
 
 #endif
